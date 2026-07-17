@@ -120,6 +120,7 @@
     font-size:.8rem;
     color:var(--amber);
     letter-spacing:.05em;
+    flex:1;
   }
   nav ul{list-style:none;display:flex;gap:26px;flex-wrap:wrap;}
   nav a{
@@ -132,6 +133,33 @@
     transition:color .15s ease;
   }
   nav a:hover{color:var(--amber);}
+
+  /* ---------- mobile nav toggle ---------- */
+  .nav-toggle{
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    width:34px;
+    height:30px;
+    background:transparent;
+    border:1px solid var(--line);
+    cursor:pointer;
+    padding:0;
+    flex-shrink:0;
+  }
+  .nav-toggle span{
+    display:block;
+    width:16px;
+    height:2px;
+    background:var(--paper-dim);
+    transition:transform .2s ease, opacity .2s ease, background .2s ease;
+  }
+  .nav-toggle:hover span{background:var(--amber);}
+  .nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;}
+  .nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
   /* ---------- hero ---------- */
   .hero{
@@ -435,8 +463,29 @@
   @media (max-width:640px){
     .wrap{padding:0 18px;}
     .nav-inner{padding:14px 18px;}
-    nav ul{gap:8px 14px;}
-    nav a{font-size:.7rem;}
+    .nav-toggle{display:flex;}
+    nav{
+      width:100%;
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .25s ease;
+    }
+    nav.open{max-height:260px;}
+    nav ul{
+      flex-direction:column;
+      gap:0;
+      margin-top:14px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+    }
+    nav li{
+      border-bottom:1px solid var(--line-soft);
+    }
+    nav a{
+      display:block;
+      padding:12px 2px;
+      font-size:.78rem;
+    }
     .hero{padding:56px 0 40px;}
     .hero-frame{padding:28px 20px;}
     .terminal-body{padding:16px 16px 18px;}
@@ -467,7 +516,10 @@
 <header>
   <div class="nav-inner">
     <div class="nav-mark">TD // BUILD&nbsp;LOG</div>
-    <nav>
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="navMenu">
       <ul>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Skills</a></li>
@@ -638,6 +690,31 @@
     });
   }
   window.addEventListener('DOMContentLoaded', runBoot);
+
+  function initNavToggle(){
+    var toggle = document.getElementById('navToggle');
+    var nav = document.getElementById('navMenu');
+    if(!toggle || !nav) return;
+
+    function closeMenu(){
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', function(){
+      var isOpen = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    nav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A') closeMenu();
+    });
+
+    window.addEventListener('resize', function(){
+      if(window.innerWidth > 640) closeMenu();
+    });
+  }
+  window.addEventListener('DOMContentLoaded', initNavToggle);
 </script>
 
 </body>
